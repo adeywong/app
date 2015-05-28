@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js>"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+	$(document).ready(function() {
+		document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+
+    // The event listener for the file upload
+ 
+    // Method that checks that the browser supports the HTML5 File API
+    function browserSupportFileUpload() {
+        var isCompatible = false;
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+        isCompatible = true;
+        }
+        return isCompatible;
+    }
+
+    // Method that reads and processes the selected file
+    function upload(evt) 
+    {
+    	evt.stopPropagation();
+    	evt.preventDefault();
+
+        if (!browserSupportFileUpload()) {
+            alert('The File APIs are not fully supported in this browser!');
+        } else {
+            var data = null;
+            var file = evt.target.files[0];
+            var reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function(event) {
+                var csvData = event.target.result;
+                data = d3.csv.parse(csvData);
+                console.log(data);
+                displayRows(data);
+                if (data && data.length > 0) {
+                  alert('Imported -' + data.length + '- rows successfully!');
+                } else {
+                    alert('No data to import!');
+                }
+            };
+            reader.onerror = function() {
+                alert('Unable to read ' + file.fileName);
+            };
+        }
+    }
+})
+
+function displayRows(dataArray)
+{
+	var table = $("#tablePreview");
+	for(i =0; i < dataArray.length; i++)
+	{
+	    var row = document.createElement('tr');
+
+		obj=dataArray[i];
+		for(var o in obj)
+		{
+			row.innerHTML += "<td>" + obj[o] + "</td>";
+		}
+		
+		table.append(row);
+	}
+}
+</script>
+<style>
+  body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .container-narrow {
+    margin: 0 auto;
+    max-width: 700px;
+  }
+  #drop_zone { border: 1px dashed grey; width: 98%; height: 60px; text-align: center;}
+</style>
+</head>
+<body>
+<div class="container-narrow">
+<div class="jumbotron">
+<form class="form" role="form" id="importForm" name="importForm" style="display: block;">
+<div class="form-group"> 
+<label for="chooseFile">Select a file to upload!</label>
+<input id="chooseFile" class="btn btn-lrg" type="file" value="Choose File (.*csv)" accept=".csv">
+</div>
+<button type="submit" class="btn btn-default">Submit</button>
+</div>
+</form>
+</div>
+</body>
+<div id="drop zone">
+	<span id
+</div>
+<div id="dvImportSegments" class="fileupload container-narrow">  
+    <fieldset>
+        <legend>Upload your CSV File</legend>
+       <div id="drop_zone">drop files here</div>
+
+        <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+   </fieldset>
+<button id="previewBtn" class="btn btn-default">Preview</button> 
+<button id="previewBtn" class="btn btn-default">Upload</button> 
+<div id="previewSection">
+<table id="tablePreview" class="table">
+</table>   
+</div>
+</div> 
+</html>
